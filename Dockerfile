@@ -1,5 +1,6 @@
 # syntax=docker/dockerfile:1
 
+<<<<<<< HEAD
 # Comments are provided throughout this file to help you get started.
 # If you need more help, visit the Dockerfile reference guide at
 # https://docs.docker.com/go/dockerfile-reference/
@@ -20,10 +21,29 @@ WORKDIR /usr/src/app
 # Leverage a cache mount to /root/.npm to speed up subsequent builds.
 # Leverage a bind mounts to package.json and package-lock.json to avoid having to copy them into
 # into this layer.
+=======
+ARG NODE_VERSION=18.0.0
+
+FROM node:${NODE_VERSION}-alpine as base
+WORKDIR /usr/src/app
+EXPOSE 3000
+
+FROM base as dev
+RUN --mount=type=bind,source=package.json,target=package.json \
+    --mount=type=bind,source=package-lock.json,target=package-lock.json \
+    --mount=type=cache,target=/root/.npm \
+    npm ci --include=dev
+USER node
+COPY . .
+CMD npm run dev
+
+FROM base as prod
+>>>>>>> 8af0c2a6b8b1d76f71e9c9be118b5945d5700c14
 RUN --mount=type=bind,source=package.json,target=package.json \
     --mount=type=bind,source=package-lock.json,target=package-lock.json \
     --mount=type=cache,target=/root/.npm \
     npm ci --omit=dev
+<<<<<<< HEAD
 
 # Run the application as a non-root user.
 USER node
@@ -36,3 +56,8 @@ EXPOSE 3000
 
 # Run the application.
 CMD node src/index.js
+=======
+USER node
+COPY . .
+CMD node src/index.js
+>>>>>>> 8af0c2a6b8b1d76f71e9c9be118b5945d5700c14
